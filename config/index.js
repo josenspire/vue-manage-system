@@ -11,16 +11,17 @@ module.exports = {
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
     proxyTable: {
-      '/api':{
-          target:'http://jsonplaceholder.typicode.com',
-          changeOrigin:true,
-          pathRewrite:{
-              '/api':''
-          }
+      '/v1/api': {
+        target: 'http://localhost:5757',
+        // target: 'http://jsonplaceholder.typicode.com',
+        changeOrigin: true,
+        pathRewrite: {
+          '/api': ''
+        }
       },
-      '/ms':{
-          target: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
-          changeOrigin: true
+      '/ms': {
+        target: 'https://www.easy-mock.com/mock/592501a391470c0ac1fab128',
+        changeOrigin: true
       }
     },
     // Various Dev Server settings
@@ -31,7 +32,7 @@ module.exports = {
     notifyOnErrors: true,
     poll: false, // https://webpack.js.org/configuration/dev-server/#devserver-watchoptions-
 
-    
+
     /**
      * Source Maps
      */
