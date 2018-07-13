@@ -3,6 +3,7 @@ import Router from 'vue-router';
 import Home from '../components/common/Home';
 import Dashboard from '../components/page/Dashboard';
 import UploadProduct from '../components/page/UploadProduct';
+import ProductManage from '../components/page/ProductManage';
 
 import BaseTable from '../components/page/BaseTable';
 import Tabs from '../components/page/Tabs';
@@ -27,6 +28,7 @@ const router = new Router({
       children: [
         { path: '/dashboard', component: Dashboard, meta: { title: '系统首页' } },
         { path: '/uploadProduct', component: UploadProduct, meta: { title: '产品上传' } },
+        { path: '/productManage', component: ProductManage, meta: { title: '产品更新' } },
 
         { path: '/table', component: BaseTable, meta: { title: '基础表格' } },
         { path: '/tabs', component: Tabs, meta: { title: 'tab选项卡' } },

@@ -35,6 +35,7 @@ export default {
         { icon: "el-icon-goods", index: "product", title: "产品管理",
           subs: [
             { index: "uploadProduct", title: "产品上传" },
+            { index: "productManage", title: "产品更新" },
           ]
         },
         { icon: "el-icon-tickets", index: "table", title: "基础表格" },
