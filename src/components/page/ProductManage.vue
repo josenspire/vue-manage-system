@@ -12,31 +12,32 @@
             <el-option key="1" label="广东省" value="广东省"></el-option>
             <el-option key="2" label="湖南省" value="湖南省"></el-option>
         </el-select> -->
-        <el-input v-model="select_word" placeholder="产品关键字搜索" class="handle-input mr10"></el-input>
+        <el-input v-model="searchKeyword" placeholder="产品关键字搜索" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="search" @click="search">搜索</el-button>
       </div>
-      <el-table class='product-list' :data="data" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
+      <el-table class='product-list' :data="productTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="date" label="产品ID" sortable width="180">
+        <el-table-column prop="productId" label="产品ID" sortable width="180">
         </el-table-column>
-        <el-table-column prop="name" label="产品图片" width="100">
+        <el-table-column label="产品图片" width="100">
           <template slot-scope="scope">
-            <img src="../../../static/img/img.jpg" alt="" style="width: 80px; height: 80px;"/>
+            <!-- <img src="../../../static/img/img.jpg" alt="" style="width: 80px; height: 80px;"/> -->
+            <img :src="scope.row.productPic" alt="" style="width: 80px; height: 80px;"/>
           </template>
         </el-table-column>
-        <el-table-column prop="name" label="产品标题">
+        <el-table-column prop="productName" label="产品标题">
         </el-table-column>
-        <el-table-column prop="name" label="产品规格">
+        <el-table-column prop="stocks[0].size" label="产品规格" width="80">
         </el-table-column>
-        <el-table-column prop="name" label="产品描述">
+        <el-table-column prop="productDesc" label="产品描述">
         </el-table-column>
-        <el-table-column prop="name" label="产品单价" width="80">
+        <el-table-column prop="stocks[0].originPrice" label="产品单价" width="80">
         </el-table-column>
-        <el-table-column prop="name" label="产品库存" width="80">
+        <el-table-column prop="stocks[0].quantity" label="产品库存" width="80">
         </el-table-column>
         <!-- <el-table-column prop="name" label="产品库存" :formatter="formatter">
         </el-table-column> -->
-        <el-table-column label="操作" width="180">
+        <el-table-column label="操作" width="148">
           <template slot-scope="scope">
             <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
             <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
@@ -44,25 +45,33 @@
         </el-table-column>
       </el-table>
 
-      <div class="pagination">
-        <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :total="1000">
+      <div class="pagination" v-if='!isEmpty'>
+        <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :page-size='pageInfo.pageSize' :total="productGroups.length">
         </el-pagination>
       </div>
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-      <el-form ref="form" :model="form" label-width="50px">
-        <el-form-item label="日期">
-          <el-date-picker type="date" placeholder="选择日期" v-model="form.date" value-format="yyyy-MM-dd" style="width: 100%;"></el-date-picker>
+    <el-dialog title="编辑" :visible.sync="editVisible" width="60%">
+      <el-form v-if='editVisible' ref="form" :model="form" label-width="50px">
+        <el-form-item label="完整标题">
+          <el-input type='text' v-model='form.productName'/>
         </el-form-item>
-        <el-form-item label="姓名">
-          <el-input v-model="form.name"></el-input>
+        <el-form-item label="子标题">
+          <el-input type='text' v-model='form.productSubName'/>
         </el-form-item>
-        <el-form-item label="地址">
-          <el-input v-model="form.address"></el-input>
+        <el-form-item label="产品描述">
+          <el-input v-model="form.productDesc"></el-input>
         </el-form-item>
-
+        <el-form-item label="产品规格">
+          <el-input v-model="form.stocks.size"></el-input>
+        </el-form-item>
+        <el-form-item label="单价">
+          <el-input v-model="form.stocks.originPrice"></el-input>
+        </el-form-item>
+        <el-form-item label="库存">
+          <el-input v-model="form.stocks.quantity"></el-input>
+        </el-form-item>
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
@@ -82,16 +91,22 @@
 </template>
 
 <script>
+import _ from 'lodash';
+import ProductService from '@/services/product.service.js';
+
 export default {
   name: "basetable",
   data() {
     return {
       url: "./static/vuetable.json",
-      tableData: [],
-      cur_page: 1,
+      productGroups: [],
+      pageInfo: {
+        pageSize: 10,
+        currentPage: 1,
+      },
       multipleSelection: [],
       select_cate: "",
-      select_word: "",
+      searchKeyword: "",
       del_list: [],
       is_search: false,
       editVisible: false,
@@ -108,46 +123,48 @@ export default {
     this.getData();
   },
   computed: {
-    data() {
-      return this.tableData.filter(d => {
-        let is_del = false;
-        for (let i = 0; i < this.del_list.length; i++) {
-          if (d.name === this.del_list[i].name) {
-            is_del = true;
-            break;
-          }
-        }
-        if (!is_del) {
-          if (
-            d.address.indexOf(this.select_cate) > -1 &&
-            (d.name.indexOf(this.select_word) > -1 ||
-              d.address.indexOf(this.select_word) > -1)
-          ) {
-            return d;
-          }
-        }
-      });
+    isEmpty () {
+      return _.isEmpty(this.productGroups);
+    },
+    productTableData () {
+      // return this.productGroups.filter(d => {
+      //   let is_del = false;
+      //   for (let i = 0; i < this.del_list.length; i++) {
+      //     if (d.name === this.del_list[i].name) {
+      //       is_del = true;
+      //       break;
+      //     }
+      //   }
+      //   if (!is_del) {
+      //     if (
+      //       d.address.indexOf(this.select_cate) > -1 &&
+      //       (d.name.indexOf(this.searchKeyword) > -1 ||
+      //         d.address.indexOf(this.searchKeyword) > -1)
+      //     ) {
+      //       return d;
+      //     }
+      //   }
+      // });
+      let currentPage = (this.pageInfo.currentPage - 1);
+      let pageSize = this.pageInfo.pageSize;
+      const productGroups = this.productGroups.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
+      return productGroups;
     }
   },
   methods: {
-    // 分页导航
     handleCurrentChange(val) {
-      this.cur_page = val;
-      this.getData();
+      this.pageInfo.currentPage = val;
     },
     // 获取 easy-mock 的模拟数据
-    getData() {
-      // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
-      if (process.env.NODE_ENV === "development") {
-        this.url = "/ms/table/list";
+    async getData() {
+      const result = await ProductService.queryProduct().catch(err => {
+        this.$message.error("获取产品数据失败", err);
+      });
+      if (result.status === 200) {
+        this.productGroups = result.data;
+      } else {
+        this.$message.error("获取产品数据失败", result.message);
       }
-      this.$axios
-        .post(this.url, {
-          page: this.cur_page
-        })
-        .then(res => {
-          this.tableData = res.data.list;
-        });
     },
     search() {
       this.is_search = true;
@@ -160,11 +177,17 @@ export default {
     },
     handleEdit(index, row) {
       this.idx = index;
-      const item = this.tableData[index];
+      const item = this.productGroups[index];
+      console.log(item);
       this.form = {
-        name: item.name,
-        date: item.date,
-        address: item.address
+        productName: item.productName,
+        productSubName: item.productSubName,
+        productDesc: item.productDesc,
+        stocks: {
+          size: item.stocks[0].size,
+          originPrice: item.stocks[0].originPrice,
+          quantity: item.stocks[0].quantity,
+        },
       };
       this.editVisible = true;
     },
@@ -187,13 +210,13 @@ export default {
     },
     // 保存编辑
     saveEdit() {
-      this.$set(this.tableData, this.idx, this.form);
+      this.$set(this.productGroups, this.idx, this.form);
       this.editVisible = false;
       this.$message.success(`修改第 ${this.idx + 1} 行成功`);
     },
     // 确定删除
     deleteRow() {
-      this.tableData.splice(this.idx, 1);
+      this.productGroups.splice(this.idx, 1);
       this.$message.success("删除成功");
       this.delVisible = false;
     }

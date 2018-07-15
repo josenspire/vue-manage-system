@@ -1,7 +1,11 @@
-import { addProduct } from '@/repositories/product.repository';
+import ProductService from '@/repositories/product.repository';
 
 module.exports = {
   async addProduct (params) {
-    return addProduct(params);
+    return ProductService.addProduct(params);
+  },
+
+  async queryProduct () {
+    return ProductService.queryProduct();
   },
 };

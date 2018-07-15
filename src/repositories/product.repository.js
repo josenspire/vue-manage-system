@@ -7,4 +7,11 @@ module.exports = {
     const body = await post(url, params);
     return body.data;
   },
+
+  async queryProduct () {
+    const url = `${getBaseUrl()}/product/normal`;
+    console.log(url);
+    const body = await get(url);
+    return body.data;
+  },
 };
