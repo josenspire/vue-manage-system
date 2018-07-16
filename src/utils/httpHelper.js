@@ -17,4 +17,20 @@ module.exports = {
       data: params,
     });
   },
+
+  deleteMethod (url, params) {
+    return axios.request({
+      url: url,
+      method: 'DELETE',
+      data: params,
+    });
+  },
+
+  put (url, params) {
+    return axios.request({
+      url: url,
+      method: 'PUT',
+      data: params,
+    });
+  },
 };

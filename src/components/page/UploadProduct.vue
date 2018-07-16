@@ -190,9 +190,6 @@ export default {
       }
       return isJPG && isLt2M;
     },
-    submitUpload() {
-      this.$refs.upload.submit();
-    },
     async submitForm() {
       this.product.arguments[0].originPrice = this.product.originPrice;
       console.log(this.product);

@@ -1,11 +1,19 @@
-import ProductService from '@/repositories/product.repository';
+import ProductRepository from '@/repositories/product.repository';
 
 module.exports = {
-  async addProduct (params) {
-    return ProductService.addProduct(params);
+  addProduct (params) {
+    return ProductRepository.addProduct(params);
   },
 
-  async queryProduct () {
-    return ProductService.queryProduct();
+  queryProduct () {
+    return ProductRepository.queryProduct();
+  },
+
+  updateProduct (params) {
+    return ProductRepository.updateProduct(params);
+  },
+
+  deleteProduct (params) {
+    return ProductRepository.deleteProduct(params);
   },
 };
