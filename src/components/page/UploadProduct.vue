@@ -96,6 +96,7 @@
 </template>
 
 <script>
+import bus from '@/components/common/bus.js';
 import VueCropper from "vue-cropperjs";
 import { addProduct } from '@/services/product.service';
 
@@ -179,10 +180,12 @@ export default {
       }
     },
     beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg';
+      console.log(file.type);
+      const isJPG = (file.type === 'image/jpeg');
+      const isPNG = (file.type === 'image/png');
       const isLt2M = file.size / 1024 / 1024 < 2;
 
-      if (!isJPG) {
+      if (!isJPG && !isPNG) {
         this.$message.error('产品图片只能是 JPG / PNG 格式!');
       }
       if (!isLt2M) {
@@ -191,17 +194,22 @@ export default {
       return isJPG && isLt2M;
     },
     async submitForm() {
+      bus.$emit('loading', true);
       this.product.arguments[0].originPrice = this.product.originPrice;
-      console.log(this.product);
-      const result = await addProduct({productType: 'normal', productInfo: [this.product]});
+      const result = await addProduct({productType: 'normal', productInfo: [this.product]}).catch(err => {
+        bus.$emit('loading', true);
+        this.$message.error(`产品添加失败: ${err}`);
+      });
+      bus.$emit('loading', false);
       if (result.status === 200) {
         this.resetForm();
         this.$notify.success({
           title: "添加成功",
           message: "产品添加成功"
         });
+      } else {
+        this.$message.error(`产品添加失败: ${result.message}`);
       }
-      console.log(result);
     },
     resetForm() {
       this.product = Object.assign({}, this.tempProduct);

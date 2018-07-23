@@ -7,7 +7,10 @@
       <div class="content">
         <transition name="move" mode="out-in">
           <keep-alive :include="tagsList">
-              <router-view></router-view>
+              <router-view v-loading="loading"
+                element-loading-text="上传中, 请稍等..."
+                element-loading-spinner="el-icon-loading">
+              </router-view>
           </keep-alive>
         </transition>
       </div>
@@ -24,7 +27,8 @@ export default {
   data() {
     return {
       tagsList: [],
-      collapse: false
+      collapse: false,
+      loading: false,
     };
   },
   components: {
@@ -45,6 +49,10 @@ export default {
       }
       this.tagsList = arr;
     });
-  }
+
+    bus.$on('loading', status => {
+      this.loading = status;
+    });
+  },
 };
 </script>
