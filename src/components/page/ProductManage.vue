@@ -57,7 +57,7 @@
       </el-upload>
 
       <el-form v-if='editVisible' ref="form" :model="form" label-width="80px" :span='24'>
-        <el-form-item label="完整标题">
+        <el-form-item label="图片链接">
           <el-input type='text' v-model='form.productPic' class='compose-input'/>
         </el-form-item>
         <el-form-item label="完整标题">
