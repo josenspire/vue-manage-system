@@ -25,4 +25,11 @@ module.exports = {
     const body = await deleteMethod(url, params);
     return body.data;
   },
+
+  async searchProduct (params) {
+    const url = `${getBaseUrl()}/product/search`;
+    const body = await post(url, params);
+    return body.data;
+  },
+
 };

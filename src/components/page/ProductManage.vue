@@ -6,11 +6,12 @@
       </el-breadcrumb>
     </div>
     <div class="container">
-      <!-- <div class="handle-box">
-        <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>
+      <div class="handle-box">
+        <el-button type="warning" icon="delete" class="handle-del mr10" @click="refreshProducts">刷新产品</el-button>
+        <!-- <el-button type="primary" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button> -->
         <el-input v-model="searchKeyword" placeholder="产品关键字搜索" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="search" @click="search">搜索</el-button>
-      </div> -->
+      </div>
       <el-table class='product-list' :data="productTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
         <el-table-column prop="productId" label="产品ID" sortable width="180">
@@ -28,6 +29,8 @@
         <el-table-column prop="productDesc" label="产品描述">
         </el-table-column>
         <el-table-column prop="stocks[0].originPrice" label="产品单价" width="80">
+        </el-table-column>
+        <el-table-column prop="stocks[0].commission" label="产品佣金" width="80">
         </el-table-column>
         <el-table-column prop="stocks[0].quantity" label="产品库存" width="80">
         </el-table-column>
@@ -83,6 +86,11 @@
         </el-row>
         <el-row :gutter="24">
           <el-col :span='12'>
+            <el-form-item label="佣金">
+              <el-input v-model="form.stocks[0].commission" class='compose-input'/>
+            </el-form-item>
+          </el-col>
+          <el-col :span='12'>
             <el-form-item label="库存">
               <el-input v-model="form.stocks[0].quantity" class='compose-input'/>
             </el-form-item>
@@ -108,6 +116,7 @@
 
 <script>
 import _ from 'lodash';
+import bus from '@/components/common/bus.js';
 import ProductService from '@/services/product.service.js';
 
 export default {
@@ -156,17 +165,37 @@ export default {
     },
     // 获取 easy-mock 的模拟数据
     async getData() {
+      bus.$emit('loading', true);
       const result = await ProductService.queryProduct().catch(err => {
+        bus.$emit('loading', false);
         this.$message.error("获取产品数据失败", err);
       });
+      bus.$emit('loading', false);
       if (result.status === 200) {
         this.productGroups = result.data;
       } else {
         this.$message.error("获取产品数据失败", result.message);
       }
     },
-    search() {
-      this.is_search = true;
+    async search() {
+      if (_.isEmpty(this.searchKeyword)) {
+        return this.$message.warning("请输入搜索条件");
+      }
+      bus.$emit('loading', true);
+      const result = await ProductService.searchProduct({ condition: this.searchKeyword }).catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("搜索产品失败: ", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.productGroups = result.data;
+      } else {
+        this.$message.error("搜索产品失败", result.message);
+      }
+    },
+    refreshProducts () {
+      this.searchKeyword = "";
+      this.getData();
     },
     formatter(row, column) {
       return row.address;

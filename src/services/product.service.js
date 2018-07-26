@@ -16,4 +16,8 @@ module.exports = {
   deleteProduct (params) {
     return ProductRepository.deleteProduct(params);
   },
+
+  searchProduct (params) {
+    return ProductRepository.searchProduct(params);
+  },
 };

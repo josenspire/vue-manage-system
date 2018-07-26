@@ -59,10 +59,14 @@
             <el-input v-model="product.productSubName" placeholder="JMsolution 蜂蜜面膜"></el-input>
           </el-form-item>
           
+          <el-form-item label="产品描述" prop="productDesc">
+            <el-input v-model="product.productDesc" placeholder="泰国RAY面膜，一款真正的泰货，极其服帖的蚕丝，效果远超一线品牌，银色清洁嫩肤，超强补水；金色抗皱去痘亮肤"></el-input>
+          </el-form-item>
+
           <el-row :gutter="24">
             <el-col :span='12'>
-              <el-form-item label="产品描述" prop="productDesc">
-                <el-input v-model="product.productDesc" placeholder="泰国RAY面膜，一款真正的泰货，极其服帖的蚕丝，效果远超一线品牌，银色清洁嫩肤，超强补水；金色抗皱去痘亮肤"></el-input>
+              <el-form-item label="产品分佣" prop="commission">
+                <el-input v-model="product.arguments[0].commission" placeholder="分佣比例（例：10%）"></el-input>
               </el-form-item>
             </el-col>
             <el-col :span='12'>
@@ -117,6 +121,7 @@ export default {
         productSubName: "",
         productPic: "",
         productDesc: "",
+        commission: "",
         originPrice: null,
         arguments: [{
           size: '10片装',
@@ -129,6 +134,7 @@ export default {
         productSubName: "",
         productPic: "",
         productDesc: "",
+        commission: "",
         originPrice: null,
         arguments: [{
           size: '10片装',
