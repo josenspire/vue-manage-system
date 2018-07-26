@@ -2,6 +2,9 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from '../components/common/Home';
 import Dashboard from '../components/page/Dashboard';
+
+import UserManage from '../components/page/UserManage';
+
 import UploadProduct from '../components/page/UploadProduct';
 import ProductManage from '../components/page/ProductManage';
 
@@ -27,6 +30,9 @@ const router = new Router({
       path: '/', component: Home, name: Home, meta: { title: '自述文件' },
       children: [
         { path: '/dashboard', component: Dashboard, meta: { title: '系统首页' } },
+
+        { path: '/userManage', component: UserManage, meta: { title: '用户管理' } },
+
         { path: '/uploadProduct', component: UploadProduct, meta: { title: '产品上传' } },
         { path: '/productManage', component: ProductManage, meta: { title: '产品更新' } },
 

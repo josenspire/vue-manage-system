@@ -115,7 +115,7 @@ export default {
       dialogVisible: false,
 
       imageUrl: '',
-      imageRemoveUrl: '11111111',
+      imageRemoveUrl: '',
       product: {
         productName: "",
         productSubName: "",

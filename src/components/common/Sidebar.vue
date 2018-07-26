@@ -32,6 +32,11 @@ export default {
       collapse: false,
       items: [
         { icon: "el-icon-setting", index: "dashboard", title: "系统首页" },
+        { icon: "el-icon-news", index: "user", title: "用户代理",
+          subs: [
+            { index: "userManage", title: "用户管理" },
+          ]
+        },
         { icon: "el-icon-goods", index: "product", title: "产品管理",
           subs: [
             { index: "uploadProduct", title: "产品上传" },
