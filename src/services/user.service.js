@@ -4,4 +4,8 @@ module.exports = {
   UserLogin (params) {
     return UserRepository.UserLogin(params);
   },
+
+  queryUserList () {
+    return UserRepository.queryUserList();
+  },
 };

@@ -7,4 +7,10 @@ module.exports = {
     const body = await post(url, params);
     return body.data;
   },
+
+  async queryUserList () {
+    const url = `${getBaseUrl()}/user/list`;
+    const body = await get(url);
+    return body.data;
+  },
 };

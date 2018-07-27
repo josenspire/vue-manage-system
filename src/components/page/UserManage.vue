@@ -13,29 +13,29 @@
       </div>
       <el-table class='user-list' :data="userTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="userId" label="用户ID" sortable width="180">
+        <el-table-column prop="user.userId" label="用户ID" sortable width="180">
         </el-table-column>
         <el-table-column label="用户头像" width="100">
           <template slot-scope="scope">
-            <img :src="scope.row.avatarUrl" alt="" style="width: 80px; height: 80px;"/>
+            <img :src="scope.row.wxInfo.avatarUrl" alt="" style="width: 80px; height: 80px;"/>
           </template>
         </el-table-column>
-        <el-table-column prop="nickName" label="用户昵称" width="80">
+        <el-table-column prop="wxInfo.nickName" label="用户昵称" width="80">
         </el-table-column>
         <el-table-column prop="openId" label="OpenID">
         </el-table-column>
         <el-table-column label="性别" width="80">
           <template slot-scope="scope">
-            {{ scope.row.gender === 1 ? "男" : "女" }}
+            {{ scope.row.wxInfo.gender === 1 ? "男" : "女" }}
           </template>
         </el-table-column>
-        <el-table-column prop="invitationCode" label="邀请码" width="80">
+        <el-table-column prop="teamInfo.team.invitationCode" label="邀请码" width="80">
         </el-table-column>
-        <el-table-column prop="superiorAgent" label="上级代理">
+        <el-table-column prop="teamInfo.team.superiorAgent" label="上级代理">
         </el-table-column>
-        <el-table-column prop="topAgent" label="顶级代理">
+        <el-table-column prop="teamInfo.team.topAgent" label="顶级代理">
         </el-table-column>
-        <el-table-column prop="agent" label="下级代理（总计）" width="80">
+        <el-table-column prop="teamInfo.secondAgents.count" label="下级代理（总计）" width="80">
         </el-table-column>
         <el-table-column label="操作" width="148">
           <template slot-scope="scope">
@@ -52,21 +52,23 @@
     </div>
 
     <!-- 编辑弹出框 -->
-    <el-dialog title="产品编辑" :visible.sync="editVisible" width="40%">
+    <el-dialog title="用户更新" :visible.sync="editVisible" width="40%">
       <el-form v-if='editVisible' ref="form" :model="form" label-width="80px" :span='24'>
-        <el-form-item label="图片链接">
-          <el-input type='text' v-model='form.productPic' class='compose-input'/>
+        <label class='wx-info'>微信信息</label>
+        <el-form-item label="用户头像">
+          <img :src="form.wxInfo.avatarUrl" alt="用户头像" style="width: 80px; height: 80px;"/>
         </el-form-item>
-        <el-form-item label="完整标题">
-          <el-input type='text' v-model='form.productName' class='compose-input'/>
+        <el-form-item label="用户昵称">
+          <el-input type='text' readonly :value='form.wxInfo.nickName' class='compose-input'/>
         </el-form-item>
-        <el-form-item label="子标题">
-          <el-input type='text' v-model='form.productSubName' class='compose-input'/>
+        <el-form-item label="用户性别">
+          <el-input type='text' readonly :value='form.wxInfo.gender' class='compose-input'/>
         </el-form-item>
-        <el-form-item label="产品描述">
-          <el-input v-model="form.productDesc" class='compose-input'/>
+        <el-form-item label="Open ID">
+          <el-input type='text' readonly :value='form.openId' class='compose-input'/>
         </el-form-item>
-        <el-row :gutter="24">
+
+        <!-- <el-row :gutter="24">
           <el-col :span='12'>
             <el-form-item label="产品规格">
               <el-input v-model="form.stocks[0].size" class='compose-input'/>
@@ -89,7 +91,7 @@
               <el-input v-model="form.stocks[0].quantity" class='compose-input'/>
             </el-form-item>
           </el-col>
-        </el-row>
+        </el-row> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
@@ -131,16 +133,16 @@ export default {
       editVisible: false,
       delVisible: false,
       form: {
-        name: "",
-        date: "",
-        address: ""
+        openId: 'o_0uP4rQCdGrft8viYxO5rbkkLWg',
+        user: {},
+        teamInfo: {},
+        wxInfo: {},
       },
-      imageUrl: '',
       deleteItem: [],
     };
   },
   created() {
-    this.getData();
+    this.loadData();
   },
   computed: {
     isEmpty () {
@@ -158,21 +160,26 @@ export default {
       this.pageInfo.currentPage = val;
     },
     // 获取 easy-mock 的模拟数据
-    async getData() {
-      // bus.$emit('loading', true);
-      // const result = await UserService.queryProduct().catch(err => {
-      //   bus.$emit('loading', false);
-      //   this.$message.error("获取产品数据失败", err);
-      // });
-      // bus.$emit('loading', false);
-      // if (result.status === 200) {
-      //   this.userGroups = result.data;
-      // } else {
-      //   this.$message.error("获取产品数据失败", result.message);
-      // }
-      this.userGroups = [
-        { userId: '12345', avatarUrl: '', openId: 'o 45645', nickName: 'james', gender: 1, invitationCode: 'C45477S', superiorAgent: 'asd', topAgent: 'fdsa', agent: 1245 },
-      ];
+    async loadData() {
+      bus.$emit('loading', true);
+      const result = await UserService.queryUserList().catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("获取用户数据失败", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.userGroups = this.convertUserGroups(result.data);
+      } else {
+        this.$message.error("获取用户数据失败", result.message);
+      }
+      // this.userGroups = [
+      //   { userId: '12345', avatarUrl: '', openId: 'o 45645', nickName: 'james', gender: 1, invitationCode: 'C45477S', superiorAgent: 'asd', topAgent: 'fdsa', agent: 1245 },
+      // ];
+    },
+    convertUserGroups (userGroups) {
+      return _.map(userGroups, user => {
+        return user;
+      });
     },
     async search() {
       if (_.isEmpty(this.searchKeyword)) {
@@ -192,7 +199,7 @@ export default {
     },
     refreshUserList () {
       this.searchKeyword = "";
-      this.getData();
+      this.loadData();
     },
     formatter(row, column) {
       return row.address;
@@ -233,7 +240,7 @@ export default {
       this.editVisible = false;
       if (result.status === 200) {
         this.$message.success(`产品更新成功`);
-        this.getData();
+        this.loadData();
       } else {
         this.$message.error(`产品更新失败: ${result.message}`);
       }
@@ -246,37 +253,16 @@ export default {
       this.delVisible = false;
       if (result.status === 200) {
         this.$message.success("删除成功");
-        this.getData();
+        this.loadData();
       } else {
         this.$message.error(`产品删除失败: ${result.message}`);
       }
-    },
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
-      if (res.status === 200) {
-        const url = res.data;
-        this.imageRemoveUrl = url;
-        this.form.productPic = url;
-      }
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = (file.type === 'image/jpeg') || (file.type === 'image/jpg') || (file.type === 'image/png');
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error('产品图片只能是 JPG / PNG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('产品图片大小不能超过 2MB!');
-      }
-      return isJPG && isLt2M;
     },
   },
   watch: {
     editVisible: function (val) {
       if (!val) {
         this.form = {};
-        this.imageUrl = null;
       }
     },
   },
