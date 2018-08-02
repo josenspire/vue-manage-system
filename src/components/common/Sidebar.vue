@@ -37,6 +37,11 @@ export default {
             { index: "userManage", title: "用户管理" },
           ]
         },
+        { icon: "el-icon-bell", index: "order", title: "订单管理",
+          subs: [
+            { index: "orderManage", title: "订单管理" },
+          ]
+        },
         { icon: "el-icon-goods", index: "product", title: "产品管理",
           subs: [
             { index: "uploadProduct", title: "产品上传" },

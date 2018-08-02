@@ -7,6 +7,7 @@ import UserManage from '../components/page/UserManage';
 
 import UploadProduct from '../components/page/UploadProduct';
 import ProductManage from '../components/page/ProductManage';
+import OrderManage from '../components/page/OrderManage';
 
 import BaseTable from '../components/page/BaseTable';
 import Tabs from '../components/page/Tabs';
@@ -32,6 +33,7 @@ const router = new Router({
         { path: '/dashboard', component: Dashboard, meta: { title: '系统首页' } },
 
         { path: '/userManage', component: UserManage, meta: { title: '用户管理' } },
+        { path: '/orderManage', component: OrderManage, meta: { title: '订单管理' } },
 
         { path: '/uploadProduct', component: UploadProduct, meta: { title: '产品上传' } },
         { path: '/productManage', component: ProductManage, meta: { title: '产品更新' } },

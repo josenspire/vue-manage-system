@@ -1,19 +1,20 @@
 <template>
-  <div class="user-manage">
+  <div class='order-manage'>
     <div class="crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-tickets"></i> 用户列表</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-tickets"></i> 订单列表</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-tickets"></i> 未发货订单</el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
       <div class="handle-box">
-        <el-button type="warning" icon="delete" class="handle-del mr10" @click="refreshUserList">刷新信息</el-button>
-        <el-input v-model="searchKeyword" placeholder="用户昵称搜索" class="handle-input mr10"></el-input>
+        <el-button type="warning" icon="delete" class="handle-del mr10" @click="refreshOrderList">刷新</el-button>
+        <el-input v-model="searchKeyword" placeholder="根据用户名搜索订单" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="search" @click="search">搜索</el-button>
       </div>
-      <el-table class='user-list' :data="userTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
+      <el-table class='order-list' :data="orderTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="user.userId" label="用户ID" sortable width="180">
+        <el-table-column prop="order.orderId" label="用户ID" sortable width="180">
         </el-table-column>
         <el-table-column label="用户头像" width="100">
           <template slot-scope="scope">
@@ -46,7 +47,7 @@
       </el-table>
 
       <div class="pagination" v-if='!isEmpty'>
-        <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :page-size='pageInfo.pageSize' :total="userGroups.length">
+        <el-pagination @current-change="handleCurrentChange" layout="prev, pager, next" :page-size='pageInfo.pageSize' :total="orderGroups.length">
         </el-pagination>
       </div>
     </div>
@@ -67,31 +68,6 @@
         <el-form-item label="Open ID">
           <el-input type='text' readonly :value='form.openId' class='compose-input'/>
         </el-form-item>
-
-        <!-- <el-row :gutter="24">
-          <el-col :span='12'>
-            <el-form-item label="产品规格">
-              <el-input v-model="form.stocks[0].size" class='compose-input'/>
-            </el-form-item>
-          </el-col>
-          <el-col :span='12'>
-            <el-form-item label="单价">
-              <el-input v-model="form.stocks[0].originPrice" class='compose-input'/>
-            </el-form-item>
-          </el-col>
-        </el-row>
-        <el-row :gutter="24">
-          <el-col :span='12'>
-            <el-form-item label="佣金">
-              <el-input v-model="form.stocks[0].commission" class='compose-input'/>
-            </el-form-item>
-          </el-col>
-          <el-col :span='12'>
-            <el-form-item label="库存">
-              <el-input v-model="form.stocks[0].quantity" class='compose-input'/>
-            </el-form-item>
-          </el-col>
-        </el-row> -->
       </el-form>
       <span slot="footer" class="dialog-footer">
         <el-button @click="editVisible = false">取 消</el-button>
@@ -113,14 +89,15 @@
 <script>
 import _ from 'lodash';
 import bus from '@/components/common/bus.js';
-import UserService from '@/services/user.service.js';
+import OrderService from '@/services/order.service.js';
 
 export default {
-  name: "basetable",
-  data() {
+  name: 'OrderManage',
+  components: {},
+  data () {
     return {
       url: "./static/vuetable.json",
-      userGroups: [],
+      orderGroups: [],
       pageInfo: {
         pageSize: 10,
         currentPage: 1,
@@ -134,51 +111,49 @@ export default {
       delVisible: false,
       form: {
         openId: '',
-        user: {},
+        order: {},
         teamInfo: {},
         wxInfo: {},
       },
       deleteItem: [],
     };
   },
-  created() {
-    this.loadData();
-  },
+  mounted () {},
+
   computed: {
     isEmpty () {
-      return _.isEmpty(this.userGroups);
+      return _.isEmpty(this.orderGroups);
     },
-    userTableData () {
+    orderTableData () {
       let currentPage = (this.pageInfo.currentPage - 1);
       let pageSize = this.pageInfo.pageSize;
-      const userGroups = this.userGroups.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
-      return userGroups;
+      const orderGroups = this.orderGroups.slice(currentPage * pageSize, currentPage * pageSize + pageSize);
+      return orderGroups;
     }
   },
   methods: {
     handleCurrentChange(val) {
       this.pageInfo.currentPage = val;
     },
-    // 获取 easy-mock 的模拟数据
     async loadData() {
-      bus.$emit('loading', true);
-      const result = await UserService.queryUserList().catch(err => {
-        bus.$emit('loading', false);
-        this.$message.error("获取用户数据失败", err);
-      });
-      bus.$emit('loading', false);
-      if (result.status === 200) {
-        this.userGroups = this.convertUserGroups(result.data);
-      } else {
-        this.$message.error("获取用户数据失败", result.message);
-      }
-      // this.userGroups = [
-      //   { userId: '12345', avatarUrl: '', openId: 'o 45645', nickName: 'james', gender: 1, invitationCode: 'C45477S', superiorAgent: 'asd', topAgent: 'fdsa', agent: 1245 },
-      // ];
+      // bus.$emit('loading', true);
+      // const result = await OrderService.queryAllOrders().catch(err => {
+      //   bus.$emit('loading', false);
+      //   this.$message.error("获取用户数据失败", err);
+      // });
+      // bus.$emit('loading', false);
+      // if (result.status === 200) {
+      //   this.orderGroups = this.convertOrderGroups(result.data);
+      // } else {
+      //   this.$message.error("获取用户数据失败", result.message);
+      // }
+      this.orderGroups = [
+        { orderId: '1', produc },
+      ];
     },
-    convertUserGroups (userGroups) {
-      return _.map(userGroups, user => {
-        return user;
+    convertOrderGroups (orderGroups) {
+      return _.map(orderGroups, order => {
+        return order;
       });
     },
     async search() {
@@ -186,18 +161,21 @@ export default {
         return this.$message.warning("请输入搜索条件");
       }
       bus.$emit('loading', true);
-      const result = await UserService.searchProduct({ condition: this.searchKeyword }).catch(err => {
+      const result = await OrderService.searchOrders({ condition: this.searchKeyword }).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("搜索产品失败: ", err);
       });
       bus.$emit('loading', false);
       if (result.status === 200) {
-        this.userGroups = result.data;
+        this.orderGroups = result.data;
       } else {
         this.$message.error("搜索产品失败", result.message);
       }
     },
-    refreshUserList () {
+    changeStatus (status) {
+      console.log('==============');
+    },
+    refreshOrderList () {
       this.searchKeyword = "";
       this.loadData();
     },
@@ -208,7 +186,7 @@ export default {
       return row.tag === value;
     },
     handleEdit(index, row) {
-      const item = this.userGroups[index];
+      const item = this.orderGroups[index];
       this.form = Object.assign({}, item);
       this.editVisible = true;
     },
@@ -216,7 +194,7 @@ export default {
       this.deleteItem = [];
 
       this.delVisible = true;
-      this.deleteItem.push(row.userId);
+      this.deleteItem.push(row.orderId);
     },
     delAll() {
       const length = this.multipleSelection.length;
@@ -232,8 +210,8 @@ export default {
       this.multipleSelection = val;
     },
     async saveEdit() {
-      const user = Object.assign({}, this.form);
-      const result = await UserService.updateProduct({ user }).catch(err => {
+      const order = Object.assign({}, this.form);
+      const result = await OrderService.updateProduct({ order }).catch(err => {
         this.editVisible = false;
         this.$message.error(`产品更新失败: ${err}`);
       });
@@ -246,7 +224,7 @@ export default {
       }
     },
     async deleteRow() {
-      const result = await UserService.deleteProduct({ productIds: this.deleteItem }).catch(err => {
+      const result = await OrderService.deleteProduct({ productIds: this.deleteItem }).catch(err => {
         this.delVisible = false;
         this.$message.error(`产品删除失败: ${err}`);
       });
@@ -266,10 +244,10 @@ export default {
       }
     },
   },
-};
+}
 </script>
 
-<style scoped>
+<style lang='scss' scoped>
 .handle-box {
   margin-bottom: 20px;
 }
