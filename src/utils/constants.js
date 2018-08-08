@@ -1,0 +1,9 @@
+module.exports = {
+  // ORDER
+  ALL_ORDER: 'ALL_ORDER',
+  UNPAY_ORDER: 1,
+  UNDERWAY_ORDER: 2,
+  REFUND_ORDER: 3,
+  COMPLETED_ORDER: 4,
+  CANCEL_ORDER: 5,
+};

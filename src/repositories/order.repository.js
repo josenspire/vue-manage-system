@@ -4,7 +4,7 @@ import getBaseUrl from '@/utils/baseUrlHelper';
 module.exports = {
   async queryAllOrders () {
     const url = `${getBaseUrl()}/order/all`;
-    const body = await get(url);
+    const body = await post(url);
     return body.data;
   },
 

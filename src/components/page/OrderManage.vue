@@ -12,13 +12,69 @@
         <el-input v-model="searchKeyword" placeholder="根据用户名搜索订单" class="handle-input mr10"></el-input>
         <el-button type="primary" icon="search" @click="search">搜索</el-button>
       </div>
+
+      <el-collapse accordion class='collapse-main'>
+        <el-collapse-item class='collapse-item'>
+          <template slot="title">
+            <div class='collapse-content'>
+              <span class='order-id'>订单ID</span>
+              <span class='order-number'>订单号</span>
+              <span class='order-owner'>客户</span>
+              <span class='order-created-at'>提交时间</span>
+            </div>
+            <i class="header-icon el-icon-info"></i>
+          </template>
+          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        </el-collapse-item>
+
+        <el-collapse-item>
+          <template slot="title">
+            一致性 Consistency<i class="header-icon el-icon-info"></i>
+          </template>
+          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        </el-collapse-item>
+
+        <el-collapse-item>
+          <template slot="title">
+            一致性 Consistency<i class="header-icon el-icon-info"></i>
+          </template>
+          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        </el-collapse-item>
+
+        <el-collapse-item>
+          <template slot="title">
+            一致性 Consistency<i class="header-icon el-icon-info"></i>
+          </template>
+          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+        </el-collapse-item>
+      </el-collapse>
+
+
       <el-table class='order-list' :data="orderTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
         <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="order.orderId" label="用户ID" sortable width="180">
+        <el-table-column prop="order.orderId" label="订单ID" sortable width="180">
+          <template slot-scope="scope">
+            <el-collapse accordion>
+              <el-collapse-item>
+                <template slot="title">
+                  一致性 Consistency<i class="header-icon el-icon-info"></i>
+                </template>
+                <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
+                <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
+              </el-collapse-item>
+            </el-collapse>
+          </template>
         </el-table-column>
+        <el-table-column prop="order.orderId" label="订单号" sortable width="180"></el-table-column>
+        <el-table-column prop="order.createdBy" label="订单号" sortable width="180"></el-table-column>
+
         <el-table-column label="用户头像" width="100">
           <template slot-scope="scope">
-            <img :src="scope.row.wxInfo.avatarUrl" alt="" style="width: 80px; height: 80px;"/>
+            <img :src="scope.rowl" alt="" style="width: 80px; height: 80px;"/>
           </template>
         </el-table-column>
         <el-table-column prop="wxInfo.nickName" label="用户昵称" width="80">
@@ -90,6 +146,7 @@
 import _ from 'lodash';
 import bus from '@/components/common/bus.js';
 import OrderService from '@/services/order.service.js';
+import {UNPAY_ORDER, UNDERWAY_ORDER, REFUND_ORDER, COMPLETED_ORDER, CANCEL_ORDER} from '@/utils/constants.js';
 
 export default {
   name: 'OrderManage',
@@ -118,7 +175,9 @@ export default {
       deleteItem: [],
     };
   },
-  mounted () {},
+  mounted () {
+    this.loadData();
+  },
 
   computed: {
     isEmpty () {
@@ -136,20 +195,19 @@ export default {
       this.pageInfo.currentPage = val;
     },
     async loadData() {
-      // bus.$emit('loading', true);
-      // const result = await OrderService.queryAllOrders().catch(err => {
-      //   bus.$emit('loading', false);
-      //   this.$message.error("获取用户数据失败", err);
-      // });
-      // bus.$emit('loading', false);
-      // if (result.status === 200) {
-      //   this.orderGroups = this.convertOrderGroups(result.data);
-      // } else {
-      //   this.$message.error("获取用户数据失败", result.message);
-      // }
-      this.orderGroups = [
-        { orderId: '1', produc },
-      ];
+      bus.$emit('loading', true);
+      console.log(UNDERWAY_ORDER);
+      const result = await OrderService.querySpecialOrders({status: UNDERWAY_ORDER}).catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("获取用户数据失败", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.orderGroups = this.convertOrderGroups(result.data);
+        console.log('===========', this.orderGroups);
+      } else {
+        this.$message.error("获取用户数据失败", result.message);
+      }
     },
     convertOrderGroups (orderGroups) {
       return _.map(orderGroups, order => {
@@ -173,7 +231,6 @@ export default {
       }
     },
     changeStatus (status) {
-      console.log('==============');
     },
     refreshOrderList () {
       this.searchKeyword = "";
