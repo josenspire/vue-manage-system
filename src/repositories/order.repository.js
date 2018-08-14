@@ -19,4 +19,20 @@ module.exports = {
     const body = await post(url, params);
     return body.data;
   },
+
+  async confirmDeviver (params) {
+    const url = `${getBaseUrl()}/order/deviver`;
+    const body = await post(url, params);
+    return body.data;
+  },
+  async completeOrder (params) {
+    const url = `${getBaseUrl()}/order/complete`;
+    const body = await post(url, params);
+    return body.data;
+  },
+  async cancelOrder (params) {
+    const url = `${getBaseUrl()}/order/cancel`;
+    const body = await post(url, params);
+    return body.data;
+  },
 };

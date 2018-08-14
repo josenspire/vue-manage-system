@@ -13,91 +13,36 @@
         <el-button type="primary" icon="search" @click="search">搜索</el-button>
       </div>
 
-      <el-collapse accordion class='collapse-main'>
-        <el-collapse-item class='collapse-item'>
-          <template slot="title">
-            <div class='collapse-content'>
-              <span class='order-id'>订单ID</span>
-              <span class='order-number'>订单号</span>
-              <span class='order-owner'>客户</span>
-              <span class='order-created-at'>提交时间</span>
-            </div>
-            <i class="header-icon el-icon-info"></i>
-          </template>
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-        </el-collapse-item>
-
-        <el-collapse-item>
-          <template slot="title">
-            一致性 Consistency<i class="header-icon el-icon-info"></i>
-          </template>
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-        </el-collapse-item>
-
-        <el-collapse-item>
-          <template slot="title">
-            一致性 Consistency<i class="header-icon el-icon-info"></i>
-          </template>
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-        </el-collapse-item>
-
-        <el-collapse-item>
-          <template slot="title">
-            一致性 Consistency<i class="header-icon el-icon-info"></i>
-          </template>
-          <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-          <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-        </el-collapse-item>
-      </el-collapse>
-
-
       <el-table class='order-list' :data="orderTableData" border style="width: 100%" ref="multipleTable" @selection-change="handleSelectionChange">
-        <el-table-column type="selection" width="55"></el-table-column>
-        <el-table-column prop="order.orderId" label="订单ID" sortable width="180">
-          <template slot-scope="scope">
-            <el-collapse accordion>
-              <el-collapse-item>
-                <template slot="title">
-                  一致性 Consistency<i class="header-icon el-icon-info"></i>
-                </template>
-                <div>与现实生活一致：与现实生活的流程、逻辑保持一致，遵循用户习惯的语言和概念；</div>
-                <div>在界面中一致：所有的元素和结构需保持一致，比如：设计样式、图标和文本、元素的位置等。</div>
-              </el-collapse-item>
-            </el-collapse>
-          </template>
-        </el-table-column>
-        <el-table-column prop="order.orderId" label="订单号" sortable width="180"></el-table-column>
-        <el-table-column prop="order.createdBy" label="订单号" sortable width="180"></el-table-column>
+        <el-table-column label="编号" width="50" type="index"></el-table-column>
 
-        <el-table-column label="用户头像" width="100">
+        <el-table-column prop="orderNumber" label="订单号" sortable width="140"></el-table-column>
+
+        <el-table-column prop="user.nickName" label="用户昵称"></el-table-column>
+
+        <el-table-column prop="createdAt" label="下单时间"></el-table-column>
+
+        <el-table-column label="商品数量">
           <template slot-scope="scope">
-            <img :src="scope.rowl" alt="" style="width: 80px; height: 80px;"/>
+            {{ scope.row.outbounds.length }}
           </template>
         </el-table-column>
-        <el-table-column prop="wxInfo.nickName" label="用户昵称" width="80">
-        </el-table-column>
-        <el-table-column prop="openId" label="OpenID">
-        </el-table-column>
-        <el-table-column label="性别" width="80">
+
+        <el-table-column prop="amount" label="总计"></el-table-column>
+
+        <el-table-column prop="invoice" label="发票"></el-table-column>
+
+        <el-table-column prop="remark" label="备注"></el-table-column>
+
+        <el-table-column label="订单状态">
           <template slot-scope="scope">
-            {{ scope.row.wxInfo.gender === 1 ? "男" : "女" }}
+            {{ statusMapping(scope.row.status) }}
           </template>
         </el-table-column>
-        <el-table-column prop="teamInfo.team.invitationCode" label="邀请码" width="80">
-        </el-table-column>
-        <el-table-column prop="teamInfo.team.superiorAgent" label="上级代理">
-        </el-table-column>
-        <el-table-column prop="teamInfo.team.topAgent" label="顶级代理">
-        </el-table-column>
-        <el-table-column prop="teamInfo.secondAgents.count" label="下级代理（总计）" width="80">
-        </el-table-column>
-        <el-table-column label="操作" width="148">
+        
+        <el-table-column label="操作" align='center'>
           <template slot-scope="scope">
-            <el-button size="small" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>
-            <el-button size="small" type="danger" @click="handleDelete(scope.$index, scope.row)">删除</el-button>
+            <el-button size="small" @click="handleDetailsView(scope.$index, scope.row)" type="danger">查看详情</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -108,25 +53,75 @@
       </div>
     </div>
 
-    <!-- 编辑弹出框 -->
-    <el-dialog title="用户更新" :visible.sync="editVisible" width="40%">
-      <el-form v-if='editVisible' ref="form" :model="form" label-width="80px" :span='24'>
-        <label class='wx-info'>微信信息</label>
-        <el-form-item label="用户头像">
-          <img :src="form.wxInfo.avatarUrl" alt="用户头像" style="width: 80px; height: 80px;"/>
+     <!-- 订单详情弹出框 -->
+    <el-dialog title="订单详情" :visible.sync="editVisible" width="80%">
+      <el-form v-if='editVisible' ref="viewForm" :model="form" label-width="80px" :span='24'>
+        <el-row :gutter="24">
+          <el-col :span='8'>
+            <el-form-item label="订单号">
+              <span>{{editFormData.orderNumber}}</span>
+            </el-form-item>
+          </el-col>
+          <el-col :span='8'>
+            <el-form-item label="提交时间">
+              <span>{{ editFormData.createdAt }}</span>
+            </el-form-item>
+          </el-col>
+
+          <el-col :span='8'>
+            <el-form-item label="订单状态">
+              <span>{{ statusMapping(editFormData.status) }}</span>
+            </el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-row :gutter="24">
+          <el-col :span='8'>
+            <el-form-item label="商品数量">{{editFormData.outbounds.length}}</el-form-item>
+          </el-col>
+          <el-col :span='8'>
+            <el-form-item label="折扣">{{editFormData.discount}}</el-form-item>
+          </el-col>
+          <el-col :span='8'>
+            <el-form-item label="总计">{{editFormData.amount}}</el-form-item>
+          </el-col>
+        </el-row>
+
+        <el-form-item label="产品列表">
+          <el-table :data="editFormData.outbounds" border style="width: 100%" ref="multipleTable">
+            <el-table-column label="产品名称" prop="productName"></el-table-column>
+
+            <el-table-column label="图片">
+              <template slot-scope="scope">
+                <img :src='scope.productPic' alt='产品图片' class='product-pic'/>
+              </template>
+            </el-table-column>
+
+            <el-table-column label="产品价格" prop="productUnitPrice"></el-table-column>
+            <el-table-column label="产品数量">
+              <template slot-scope="scope">
+                <el-input size='mini' type='text' v-model='scope.row.number' :disabled="viewVisible" />
+              </template>
+            </el-table-column>
+            <!-- <el-table-column label="折扣满减">
+              <template slot-scope="scope">
+                <el-input size='mini' type='text' v-model='scope.row.discount' @change='((e) => (handleEditDiscount(scope.row)))'/>
+              </template>
+            </el-table-column> -->
+            <el-table-column label="总计" prop='amount'></el-table-column>
+          </el-table>
         </el-form-item>
-        <el-form-item label="用户昵称">
-          <el-input type='text' readonly :value='form.wxInfo.nickName' class='compose-input'/>
-        </el-form-item>
-        <el-form-item label="用户性别">
-          <el-input type='text' readonly :value='form.wxInfo.gender' class='compose-input'/>
-        </el-form-item>
-        <el-form-item label="Open ID">
-          <el-input type='text' readonly :value='form.openId' class='compose-input'/>
+        
+        <el-form-item class='btn-group'>
+          <el-button v-if='editFormData.status === 2' size="small" @click="handleConfirmDeliver(editFormData.orderId)" type="warm">确认发货</el-button>
+
+          <el-button v-if='editFormData.status === 2' size="small" @click="handleComplete(editFormData.orderId)" type="success">完成交易</el-button>
+          <el-button v-if='(editFormData.status != 4) && (editFormData.status != 5)' size="small" @click="handleCancel(editFormData.orderId)" type="danger">取消订单</el-button>
         </el-form-item>
       </el-form>
+
       <span slot="footer" class="dialog-footer">
-        <el-button @click="editVisible = false">取 消</el-button>
+        <el-button @click="editVisible = viewVisible = false">取 消</el-button>
         <el-button type="primary" @click="saveEdit">确 定</el-button>
       </span>
     </el-dialog>
@@ -147,6 +142,7 @@ import _ from 'lodash';
 import bus from '@/components/common/bus.js';
 import OrderService from '@/services/order.service.js';
 import {UNPAY_ORDER, UNDERWAY_ORDER, REFUND_ORDER, COMPLETED_ORDER, CANCEL_ORDER} from '@/utils/constants.js';
+import {orderTabMapping} from '@/utils/orderStatusMapping';
 
 export default {
   name: 'OrderManage',
@@ -164,6 +160,7 @@ export default {
       searchKeyword: "",
       del_list: [],
       is_search: false,
+      viewVisible: false,
       editVisible: false,
       delVisible: false,
       form: {
@@ -173,6 +170,7 @@ export default {
         wxInfo: {},
       },
       deleteItem: [],
+      editFormData: [],
     };
   },
   mounted () {
@@ -242,6 +240,11 @@ export default {
     filterTag(value, row) {
       return row.tag === value;
     },
+    handleDetailsView (index, row) {
+      this.editFormData = _.cloneDeep(row);
+      this.viewVisible = true;
+      this.editVisible = true;
+    },
     handleEdit(index, row) {
       const item = this.orderGroups[index];
       this.form = Object.assign({}, item);
@@ -252,6 +255,54 @@ export default {
 
       this.delVisible = true;
       this.deleteItem.push(row.orderId);
+    },
+    async handleConfirmDeliver (orderId) {
+      bus.$emit('loading', true);
+      const result = await OrderService.confirmDeviver({orderId}).catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("操作失败: ", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.$message.success("确认发货完成");
+      } else {
+        this.$message.error("操作失败", result.message);
+      }
+    },
+    async handleComplete (orderId) {
+      bus.$emit('loading', true);
+      const result = await OrderService.completeOrder({orderId}).catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("操作失败: ", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.$message.success("订单已完成");
+      } else {
+        this.$message.error("操作失败", result.message);
+      }
+    },
+    async handleCancel (orderId) {
+      bus.$emit('loading', true);
+      const result = await OrderService.cancelOrder({orderId}).catch(err => {
+        bus.$emit('loading', false);
+        this.$message.error("操作失败: ", err);
+      });
+      bus.$emit('loading', false);
+      if (result.status === 200) {
+        this.$message.success("订单已取消");
+      } else {
+        this.$message.error("操作失败", result.message);
+      }
+    },
+    handleEditDiscount (row) {
+      console.log(row);
+      let amount = row.amount;
+      let discount = row.discount;
+      if (discount >= amount) {
+        row.discount = "0.00";
+      }
+      row.amount = this.calculateAmount(row);
     },
     delAll() {
       const length = this.multipleSelection.length;
@@ -293,6 +344,12 @@ export default {
         this.$message.error(`产品删除失败: ${result.message}`);
       }
     },
+    statusMapping (status) {
+      return orderTabMapping(parseInt(status));
+    },
+    calculateAmount (row) {
+      return Number(parseFloat((row.amount * 100 - row.discount * 100) / 100).toFixed(2));
+    },
   },
   watch: {
     editVisible: function (val) {
@@ -322,12 +379,9 @@ export default {
   text-align: center;
 }
 
-.upload-demo {
-  text-align: center;
+.btn-group {
+  text-align: right;
 }
 
-.avatar {
-  width: 178px;
-  height: 178px;
-}
+
 </style>
