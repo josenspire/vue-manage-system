@@ -13,8 +13,8 @@ module.exports = {
     return OrderRepository.searchOrders(params);
   },
 
-  confirmDeviver (params) {
-    return OrderRepository.confirmDeviver(params);
+  confirmDeliver (params) {
+    return OrderRepository.confirmDeliver(params);
   },
   completeOrder (params) {
     return OrderRepository.completeOrder(params);

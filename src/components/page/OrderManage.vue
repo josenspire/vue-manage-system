@@ -141,7 +141,7 @@
 import _ from 'lodash';
 import bus from '@/components/common/bus.js';
 import OrderService from '@/services/order.service.js';
-import {UNPAY_ORDER, UNDERWAY_ORDER, REFUND_ORDER, COMPLETED_ORDER, CANCEL_ORDER} from '@/utils/constants.js';
+import {UNPAY_ORDER, UNDERWAY_ORDER, REFUND_ORDER, COMPLETED_ORDER, CANCEL_ORDER, DELIVER_ORDER} from '@/utils/constants.js';
 import {orderTabMapping} from '@/utils/orderStatusMapping';
 
 export default {
@@ -258,7 +258,7 @@ export default {
     },
     async handleConfirmDeliver (orderId) {
       bus.$emit('loading', true);
-      const result = await OrderService.confirmDeviver({orderId}).catch(err => {
+      const result = await OrderService.confirmDeliver({orderId}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("操作失败: ", err);
       });

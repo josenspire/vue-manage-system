@@ -20,7 +20,7 @@ module.exports = {
     return body.data;
   },
 
-  async confirmDeviver (params) {
+  async confirmDeliver (params) {
     const url = `${getBaseUrl()}/order/deviver`;
     const body = await post(url, params);
     return body.data;

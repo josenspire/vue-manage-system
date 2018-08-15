@@ -6,4 +6,6 @@ module.exports = {
   REFUND_ORDER: 3,
   COMPLETED_ORDER: 4,
   CANCEL_ORDER: 5,
+  
+  DELIVER_ORDER: 6,
 };
