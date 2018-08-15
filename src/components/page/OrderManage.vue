@@ -194,7 +194,6 @@ export default {
     },
     async loadData() {
       bus.$emit('loading', true);
-      console.log(UNDERWAY_ORDER);
       const result = await OrderService.querySpecialOrders({status: UNDERWAY_ORDER}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("获取用户数据失败", err);
@@ -227,8 +226,6 @@ export default {
       } else {
         this.$message.error("搜索产品失败", result.message);
       }
-    },
-    changeStatus (status) {
     },
     refreshOrderList () {
       this.searchKeyword = "";
