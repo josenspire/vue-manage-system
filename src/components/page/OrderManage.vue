@@ -18,7 +18,7 @@
 
         <el-table-column prop="orderNumber" label="订单号" sortable width="140"></el-table-column>
 
-        <el-table-column prop="user.nickName" label="用户昵称"></el-table-column>
+        <el-table-column prop="user.nickname" label="用户昵称"></el-table-column>
 
         <el-table-column prop="createdAt" label="下单时间"></el-table-column>
 
