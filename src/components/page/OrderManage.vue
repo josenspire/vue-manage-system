@@ -113,10 +113,10 @@
         </el-form-item>
         
         <el-form-item class='btn-group'>
-          <el-button v-if='editFormData.status === 2' size="small" @click="handleConfirmDeliver(editFormData.orderId)" type="warm">确认发货</el-button>
+          <el-button v-if='editFormData.status === 2' size="small" @click="handleConfirmDeliver(editFormData.userId, editFormData.orderId)" type="warm">确认发货</el-button>
 
-          <el-button v-if='editFormData.status === 2' size="small" @click="handleComplete(editFormData.orderId)" type="success">完成交易</el-button>
-          <el-button v-if='(editFormData.status != 4) && (editFormData.status != 5)' size="small" @click="handleCancel(editFormData.orderId)" type="danger">取消订单</el-button>
+          <el-button v-if='editFormData.status === 2' size="small" @click="handleComplete(editFormData.userId, editFormData.orderId)" type="success">完成交易</el-button>
+          <el-button v-if='(editFormData.status != 4) && (editFormData.status != 5)' size="small" @click="handleCancel(editFormData.userId, editFormData.orderId)" type="danger">取消订单</el-button>
         </el-form-item>
       </el-form>
 
@@ -253,9 +253,10 @@ export default {
       this.delVisible = true;
       this.deleteItem.push(row.orderId);
     },
-    async handleConfirmDeliver (orderId) {
+    async handleConfirmDeliver (userId, orderId) {
       bus.$emit('loading', true);
-      const result = await OrderService.confirmDeliver({orderId}).catch(err => {
+      
+      const result = await OrderService.confirmDeliver({userId, orderId}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("操作失败: ", err);
       });
@@ -266,9 +267,9 @@ export default {
         this.$message.error("操作失败", result.message);
       }
     },
-    async handleComplete (orderId) {
+    async handleComplete (userId, orderId) {
       bus.$emit('loading', true);
-      const result = await OrderService.completeOrder({orderId}).catch(err => {
+      const result = await OrderService.completeOrder({userId, orderId}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("操作失败: ", err);
       });
@@ -279,9 +280,9 @@ export default {
         this.$message.error("操作失败", result.message);
       }
     },
-    async handleCancel (orderId) {
+    async handleCancel (userId, orderId) {
       bus.$emit('loading', true);
-      const result = await OrderService.cancelOrder({orderId}).catch(err => {
+      const result = await OrderService.cancelOrder({userId, orderId}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("操作失败: ", err);
       });

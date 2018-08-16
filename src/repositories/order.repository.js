@@ -21,7 +21,7 @@ module.exports = {
   },
 
   async confirmDeliver (params) {
-    const url = `${getBaseUrl()}/order/deviver`;
+    const url = `${getBaseUrl()}/order/deliver`;
     const body = await post(url, params);
     return body.data;
   },
