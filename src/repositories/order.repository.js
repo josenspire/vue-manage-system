@@ -1,4 +1,4 @@
-import { get, post, } from '@/utils/httpHelper';
+import { get, post, put } from '@/utils/httpHelper';
 import getBaseUrl from '@/utils/baseUrlHelper';
 
 module.exports = {
@@ -22,17 +22,17 @@ module.exports = {
 
   async confirmDeliver (params) {
     const url = `${getBaseUrl()}/order/deliver`;
-    const body = await post(url, params);
+    const body = await put(url, params);
     return body.data;
   },
   async completeOrder (params) {
     const url = `${getBaseUrl()}/order/complete`;
-    const body = await post(url, params);
+    const body = await put(url, params);
     return body.data;
   },
   async cancelOrder (params) {
     const url = `${getBaseUrl()}/order/cancel`;
-    const body = await post(url, params);
+    const body = await put(url, params);
     return body.data;
   },
 };

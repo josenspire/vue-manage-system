@@ -1,9 +1,11 @@
 <template>
   <div class='order-manage'>
+    <el-tabs v-model="activeType" @tab-click="handleClick">
+      <el-tab-pane v-for='(tab, index) in tabTypes' :key='index' :label="tab.label" :name="tab.name"></el-tab-pane>
+    </el-tabs>
     <div class="crumbs">
       <el-breadcrumb separator="/">
-        <el-breadcrumb-item><i class="el-icon-tickets"></i> 订单列表</el-breadcrumb-item>
-        <el-breadcrumb-item><i class="el-icon-tickets"></i> 未发货订单</el-breadcrumb-item>
+        <el-breadcrumb-item><i class="el-icon-tickets"></i> <a href='#'>订单列表</a></el-breadcrumb-item>
       </el-breadcrumb>
     </div>
     <div class="container">
@@ -171,6 +173,16 @@ export default {
       },
       deleteItem: [],
       editFormData: [],
+
+      status: UNDERWAY_ORDER,
+
+      activeType: 'UNDERWAY',
+      tabTypes: [
+        { label: '未处理订单', name: 'UNDERWAY', status: 2 },
+        { label: '已发货订单', name: 'DELIVERED', status: 3 },
+        { label: '已完成订单', name: 'COMPLETED', status: 4 },
+        { label: '已取消订单', name: 'CANCEL', status: 5 }
+      ],
     };
   },
   mounted () {
@@ -192,9 +204,12 @@ export default {
     handleCurrentChange(val) {
       this.pageInfo.currentPage = val;
     },
-    async loadData() {
+    async loadData(status) {
+      this.editVisible = false;
+      this.viewVisible = false;
+
       bus.$emit('loading', true);
-      const result = await OrderService.querySpecialOrders({status: UNDERWAY_ORDER}).catch(err => {
+      const result = await OrderService.querySpecialOrders({status: this.status}).catch(err => {
         bus.$emit('loading', false);
         this.$message.error("获取用户数据失败", err);
       });
@@ -263,6 +278,7 @@ export default {
       bus.$emit('loading', false);
       if (result.status === 200) {
         this.$message.success("确认发货完成");
+        this.loadData();
       } else {
         this.$message.error("操作失败", result.message);
       }
@@ -276,6 +292,7 @@ export default {
       bus.$emit('loading', false);
       if (result.status === 200) {
         this.$message.success("订单已完成");
+        this.loadData();
       } else {
         this.$message.error("操作失败", result.message);
       }
@@ -289,6 +306,7 @@ export default {
       bus.$emit('loading', false);
       if (result.status === 200) {
         this.$message.success("订单已取消");
+        this.loadData();
       } else {
         this.$message.error("操作失败", result.message);
       }
@@ -348,6 +366,13 @@ export default {
     calculateAmount (row) {
       return Number(parseFloat((row.amount * 100 - row.discount * 100) / 100).toFixed(2));
     },
+    handleClick(tab, event) {
+      const currentTab = _.find(this.tabTypes, e => {
+        return (e.name === tab.name);
+      });
+      this.status = currentTab.status;
+      this.loadData();
+    }
   },
   watch: {
     editVisible: function (val) {
