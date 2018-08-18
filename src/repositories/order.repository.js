@@ -1,4 +1,4 @@
-import { get, post, put } from '@/utils/httpHelper';
+import { get, post, put, deleteMethod } from '@/utils/httpHelper';
 import getBaseUrl from '@/utils/baseUrlHelper';
 
 module.exports = {
@@ -32,7 +32,7 @@ module.exports = {
   },
   async cancelOrder (params) {
     const url = `${getBaseUrl()}/order/cancel`;
-    const body = await put(url, params);
+    const body = await deleteMethod(url, params);
     return body.data;
   },
 };
