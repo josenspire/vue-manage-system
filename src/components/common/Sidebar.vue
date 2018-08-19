@@ -40,6 +40,7 @@ export default {
         { icon: "el-icon-bell", index: "order", title: "订单管理",
           subs: [
             { index: "orderManage", title: "订单管理" },
+            { index: "configManage", title: "配置管理" },
           ]
         },
         { icon: "el-icon-goods", index: "product", title: "产品管理",

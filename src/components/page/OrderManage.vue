@@ -158,19 +158,11 @@ export default {
         currentPage: 1,
       },
       multipleSelection: [],
-      select_cate: "",
       searchKeyword: "",
       del_list: [],
-      is_search: false,
       viewVisible: false,
       editVisible: false,
       delVisible: false,
-      form: {
-        openId: '',
-        order: {},
-        teamInfo: {},
-        wxInfo: {},
-      },
       deleteItem: [],
       editFormData: [],
 
@@ -216,7 +208,6 @@ export default {
       bus.$emit('loading', false);
       if (result.status === 200) {
         this.orderGroups = this.convertOrderGroups(result.data);
-        console.log('===========', this.orderGroups);
       } else {
         this.$message.error("获取用户数据失败", result.message);
       }
@@ -319,16 +310,6 @@ export default {
         row.discount = "0.00";
       }
       row.amount = this.calculateAmount(row);
-    },
-    delAll() {
-      const length = this.multipleSelection.length;
-      let str = "";
-      this.del_list = this.del_list.concat(this.multipleSelection);
-      for (let i = 0; i < length; i++) {
-        str += this.multipleSelection[i].name + " ";
-      }
-      this.$message.error("删除了" + str);
-      this.multipleSelection = [];
     },
     handleSelectionChange(val) {
       this.multipleSelection = val;

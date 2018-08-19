@@ -89,7 +89,7 @@
             </el-col>
           </el-row>
 
-           <el-form-item style='text-align: right;'>
+            <el-form-item style='text-align: right;'>
               <el-button type="primary" @click="submitForm()">立即创建</el-button>
               <el-button @click="resetForm()">重置</el-button>
             </el-form-item>

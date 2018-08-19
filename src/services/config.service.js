@@ -1,11 +1,11 @@
-import ConfigRepository from '@/services/config.service';
+import ConfigRepository from '@/repositories/config.repository.js';
 
 module.exports = {
   queryConfigs () {
     return ConfigRepository.queryConfigs();
   },
 
-  updateConfigs () {
+  updateConfigs (params) {
     return ConfigRepository.updateConfigs(params);
   },
 };

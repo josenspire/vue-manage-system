@@ -1,10 +1,10 @@
-import {get, put} from '@/utils/httpHelper';
+import {post, put} from '@/utils/httpHelper';
 import getBaseUrl from '@/utils/baseUrlHelper';
 
 module.exports = {
-  async queryConfig () {
+  async queryConfigs () {
     const url = `${getBaseUrl()}/config/commission`;
-    const body = await get(url);
+    const body = await post(url);
     return body.data;
   },
 
